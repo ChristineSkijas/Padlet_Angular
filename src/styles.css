@@ -1,0 +1,12 @@
+/* You can add global styles to this file, and also import other style files */
+.padding {
+  padding: 1em;
+}
+.ui.input {
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+}
+.ui.checkbox {
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+}

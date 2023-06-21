@@ -1,0 +1,66 @@
+<!--
+<div class="ui middle aligned selection divided list">
+  <a *ngFor="let padlet of padlets" class="item bs-padlet-list-item"
+     [padlet]="padlet" [routerLink]="padlet.id.toString()"></a>
+</div> -->
+
+<div class="ui center aligned segment">
+<div>
+  <h1 class="ui violet inverted centered icon header">
+    <i class="circular address card outline icon"></i>
+    Padlet-Übersicht
+  </h1>
+</div>
+
+<div class="ui cards">
+      <a
+        *ngFor="let padlet of padlets"
+        class="item ui card bs-padlet-list-item"
+        [padlet]="padlet"
+        [routerLink]="padlet.id.toString()"
+      ></a>
+      <div *ngIf="!padlets" class="ui active dimmer">
+        <div class="ui large text loader">Daten werden geladen...</div>
+      </div>
+      <p *ngIf="padlets && !padlets.length">
+        NOCH KEINE PADLET-EINRÄGE VORHANDEN!
+      </p>
+</div>
+<div class="ui small modal">
+  <i class="close icon"></i>
+  <div class="header">NEUES PADLET ERSTELLEN </div>
+  <div class="description padding">
+    <div class=""><label>Name</label></div>
+    <form [formGroup]="group">
+      <div class="ui input">
+        <input type="text" formControlName="name" />
+      </div>
+      <div class=""><label>Sichtbarkeit</label></div>
+      <div class="ui checkbox">
+        <input type="checkbox" formControlName="is_public" />
+        <label>&Ouml;ffentlich</label>
+      </div>
+    </form>
+  </div>
+  <div class="actions">
+    <div class="ui inverted secondary deny button">Abbrechen</div>
+    <div
+      class="ui positive right labeled icon button"
+      (click)="create(group.value)"
+    >
+      Speichern
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<br><br>
+  <!-- graue Trennlinie -->
+<hr />
+<div class="add-button">
+  <button class="ui labeled icon inverted violet button" (click)="showModal()" *ngIf="loggedIn">
+    <i class="plus square icon"></i>
+    NEU: Padlet
+  </button>
+</div>
+</div>

@@ -1,0 +1,28 @@
+<!-- Hinweise aus der Übung, die vlt nützlich sind für das Projekt
+ alles was über die Route reingeladen wird, wird an dieser Stelle einfach ausgespuckt
+es ist also ein Platzhalter. Dieser wird dynamisch durch die Komponente ersetzt, die von der Route geladen wird
+damit kann zB im FE einfach eine Navigationsleiste angezeigt werden -->
+
+<!-- Menüleiste -->
+<div class="ui inverted segment right menu">
+  <h3>KWM PADLETLIST 2023 | Christine Skijas</h3>
+  <div class="right menu">
+    <button>
+      <i class="ui inverted violet ellipsis horizontal icon">  </i>
+    </button>
+<button>
+  <i class="ui inverted violet download icon">  </i>
+</button>
+    <a routerLink="login" routerLinkActive="active"
+       class="ui animated fade inverted brown basic button">
+      <div class="visible content"><i class="ui inverted violet sign-out icon"></i></div>
+      <div class="hidden content">
+        {{  getLoginLabel()   }}
+      </div>
+      </a>
+  </div>
+</div>
+
+<div class="ui container">
+  <router-outlet></router-outlet>
+</div>

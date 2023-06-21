@@ -1,0 +1,236 @@
+<!-- Detailansicht eines Padlets -->
+
+<!-- Grid für Ausgabe der Padlet-Infos -->
+<div class="ui center aligned grid" *ngIf="padlet">
+  <div class="twelve wide column">
+    <h1 class="ui violet header">{{ padlet.name }}</h1>
+    <div class="ui center aligned grid">
+      <div class="four wide column">
+        <h4 class="ui header">
+          Admin: {{ padlet?.user?.firstName }} {{ padlet?.user?.lastName }} | ID:
+          {{ padlet.user_id }}
+        </h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- wird nur angezeigt, wenn noch keine Einträge vorhanden sind -->
+<div class="ui cards center aligned twelve-wide-column grid">
+  <div class="item ui violet" *ngIf="!entries || entries.length == 0">
+    Noch keine Einträge vorhanden!
+  </div>
+
+  <div *ngFor="let entrie of entries" class="item ui card">
+    <div class="content">
+      <div class="header">
+        <b>{{ entrie?.title }}</b>
+      </div>
+      <!-- Vorname, Nachname und Erstelldatum-->
+      <div class="description">{{ entrie?.content }}</div>
+    </div>
+    <!-- Kommentare und Bewertungen werden ausgeben - Bewertung: Herzen-->
+    <div *ngFor="let rating of entrie.ratings" class="content">
+      <div class="ui heart rating" *ngIf="rating.rating">
+        <i
+          *ngFor="let r of getRating(rating.rating)"
+          class="red heart icon"
+        ></i>
+      </div>
+      <div *ngFor="let c of entrie.comments">
+        <div class="description" *ngIf="rating.user.id == c.user.id">
+          {{ c.comment }}
+        </div>
+      </div>
+      <div class="meta right floated author">
+        {{ rating.user.firstName }} {{ rating.user.lastName }}
+      </div>
+    </div>
+    <br />
+
+    <!-- Buttons zum Bearbeiten von Kommenataren und Bewertungen -->
+    <div class="center aligned">
+      <hr />
+      <!-- Kommentar oder Bewertung ergänzen können -->
+      <button
+        class="ui button inverted violet tiny icon"
+        (click)="openRatingCommentModal(entrie)"
+        *ngIf="loggedIn">
+        <i class="add icon"></i>
+      </button>
+
+      <!-- Kommentar oder Bewertung ändern können -->
+      <button class="ui button inverted orange tiny icon" (click)="openEditEntryModal(entrie)" *ngIf="loggedIn">
+        <i class="edit icon"></i>
+      </button>
+
+      <!-- Kommentar oder auch Bewertung löschen können-->
+      <button
+        class="ui button tiny inverted red icon"
+        (click)="removeEntry(entrie)"
+        *ngIf="loggedIn">
+        <i class="delete icon"></i>
+      </button>
+    </div>
+    <br />
+  </div>
+</div>
+
+
+<!-- Navigation bzw. Bearbeitungs-Buttons des (ausgewählten) Padlets-->
+<br/><br/>
+<hr />
+<br/>
+<div class="ui center aligned four column grid">
+  <div class="row">
+    <button [routerLink]="'/padlets'" class="ui inverted orange labeled button icon">
+      <i class="arrow alternate circle left icon"></i> ZUR LISTE
+    </button>
+    <button class="ui labeled icon inverted violet button"
+            (click)="openAddEntryModal()" *ngIf="loggedIn">
+      <i class="plus square icon"></i>NEU
+    </button>
+
+    <button class="ui inverted secondary labeled icon button"
+            (click)="openEditModal()" *ngIf="loggedIn">
+      <i class="pencil icon"></i>  BEARBEITEN
+    </button>
+
+    <button
+      class="ui inverted red labeled icon button"
+      (click)="removePadlet()"
+      *ngIf="loggedIn">
+      <i class="remove icon"></i> LÖSCHEN
+    </button>
+</div>
+</div>
+
+<div class="ui tiny modal" id="padlet-edit">
+  <i class="close icon"></i>
+  <div class="header">Padlet bearbeiten</div>
+  <div class="description padding">
+    <div class=""><label>Padlet-Id:</label></div>
+    <form [formGroup]="group">
+      <div class="ui input disabled">
+        <input type="text" formControlName="id" readonly/>
+      </div>
+      <div class=""><label>Name: </label></div>
+      <div class="ui input">
+        <input type="text" formControlName="name"/>
+      </div>
+      <div class=""><label>Admin-ID: </label></div>
+      <div class="ui input">
+        <input type="text" formControlName="user_id"/>
+      </div>
+    </form>
+  </div>
+  <div class="actions">
+    <div class="ui inverted secondary deny button">Abbrechen</div>
+    <div
+      class="ui positive right labeled icon button"
+      (click)="update(group.value)">
+      Speichern
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="ui tiny modal entry" id="entry">
+  <i class="close icon"></i>
+  <div class="header">Neuen Eintrag erstellen: </div>
+  <div class="description padding">
+    <form [formGroup]="entryGroup">
+      <div class=""><label>User-Id</label></div>
+      <div class="ui input disabled">
+        <input type="text" formControlName="user_id" readonly/>
+      </div>
+      <div class=""><label>Padlet-Id</label></div>
+      <div class="ui input disabled">
+        <input type="text" formControlName="padlet_id" readonly/>
+      </div>
+      <div class=""><label>Titel: </label></div>
+      <div class="ui input">
+        <input type="text" formControlName="title"/>
+      </div>
+      <div class=""><label>Text: </label></div>
+      <div class="ui input">
+        <input type="text" formControlName="content"/>
+      </div>
+    </form>
+  </div>
+  <div class="actions">
+    <div class="ui inverted secondary deny button">Abbrechen</div>
+    <div
+      class="ui positive right labeled icon button"
+      (click)="createEntry(entryGroup.value)">
+      Speichern
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<!-- ab hier folgen jetzt die Kommentare und Bewertungen -->
+<div class="ui tiny modal entry" id="rating">
+  <i class="close icon"></i>
+  <div class="header">Neue Bewertung oder Kommentar hinzuf&uuml;gen</div>
+  <div class="description padding">
+    <form [formGroup]="ratingGroup">
+      <h3>Neue Bewertung hinzuf&uuml;gen</h3>
+      <div class=""><label>Bewertung (1-5)</label></div>
+      <div class="ui input">
+        <input type="number" min="0" max="5" formControlName="rating"/>
+      </div>
+    </form>
+    <form [formGroup]="commentGroup">
+      <h3>Neuen Kommentar hinzuf&uuml;gen</h3>
+      <div class=""><label>Kommentar-Text:</label></div>
+      <div class="ui input">
+        <textarea type="text" formControlName="comment"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="actions">
+    <div class="ui inverted secondary deny button">Abbrechen</div>
+    <div
+      class="ui positive right labeled icon button"
+      (click)="createRatingComment(ratingGroup, commentGroup)">
+      Speichern
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="ui tiny modal" id="entry-edit">
+  <i class="close icon"></i>
+  <div class="header">Eintrag bearbeiten</div>
+  <div class="description padding">
+    <div class=""><label>User-Id:</label></div>
+    <form [formGroup]="entryGroup">
+      <div class="ui input disabled">
+        <input type="text" formControlName="user_id" readonly/>
+      </div>
+      <div class=""><label>Entry-Id</label></div>
+      <div class="ui input disabled">
+        <input type="text" formControlName="entrie_id" readonly/>
+      </div>
+      <div class=""><label>Title</label></div>
+      <div class="ui input">
+        <input type="text" formControlName="title"/>
+      </div>
+      <div class=""><label>Content: </label></div>
+      <div class="ui input">
+        <input type="text" formControlName="content"/>
+      </div>
+    </form>
+  </div>
+  <div class="actions">
+    <div class="ui inverted secondary deny button">Abbrechen</div>
+    <div
+      class="ui positive right labeled icon button"
+      (click)="updateEntry(entryGroup.value)">
+      Speichern<i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+

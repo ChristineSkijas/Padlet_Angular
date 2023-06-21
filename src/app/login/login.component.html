@@ -1,0 +1,58 @@
+
+<!--Login-Formular für User -->
+
+<!-- Wird angezeigt, wenn User noch nicht eingelogged ist und sich einloogen möchte -->
+<div *ngIf="!isLoggedIn()">
+  <h1>Login</h1>
+  <form class="ui large form" [formGroup]="loginForm"
+        (ngSubmit)="login()">
+    <div class="field">
+      <label>E-Mail</label>
+      <input type="email" id="username" formControlName="username">
+      <div *ngIf="loginForm.get('username')?.invalid &&
+(loginForm.get('username')?.dirty ||
+loginForm.get('username')?.touched) &&
+loginForm.get('username')?.hasError('required')" class="ui negative
+message">
+        Benutzername ist verpflichtend </div>
+      <div *ngIf="loginForm.get('username')?.invalid &&
+(loginForm.get('username')?.dirty ||
+loginForm.get('username')?.touched) &&
+loginForm.get('username')?.hasError('email')" class="ui negative
+message">
+        E-Mail-Format überprüfen </div>
+    </div>
+    <div class="field">
+      <label>Passwort</label>
+      <input type="password" formControlName="password">
+      <div *ngIf="loginForm.get('password')?.invalid &&
+(loginForm.get('password')?.dirty ||
+loginForm.get('password')?.touched)" class="ui negative message">
+        Bitte Password eingeben! </div>
+    </div>
+    <button type="submit" class="ui button"
+            [disabled]="loginForm.invalid">Login</button>
+  </form>
+  <br />
+  <!-- Userin kann sich dann entweder einloggen oder zurück zur Listübersicht der Padlet gehen -->
+  <button [routerLink]="'/padlets'" class="ui inverted orange labeled button icon">
+    ZURÜCK ZUR LISTE!
+  </button>
+</div>
+
+
+<!-- ist der User bereits eingelogged, soll angezeigt werden das er sich ausloggen kann-->
+<br />
+<hr />
+<br />
+<div class="ui center aligned two column grid">
+    <div class="ui buttons" *ngIf="isLoggedIn()">
+      <button type="button" class="ui inverted violet button"
+              (click)="logout()">  Ausloggen  </button>
+      <div class="or"></div>
+    <button [routerLink]="'/padlets'" class="ui inverted orange labeled button icon">
+      ZURÜCK ZUR LISTE
+    </button>
+  </div>
+</div>
+
